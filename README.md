@@ -1,5 +1,5 @@
 # myproject
-
+Vue calculator
 ## Project setup
 ```
 npm install
