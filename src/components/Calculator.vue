@@ -41,27 +41,62 @@ export default {
           : `-${this.current}`;
     },
     percent() {
-      this.current = `${this.current && this.current !== "-" ? parseFloat(this.current) / 100 : 0}`;
+      this.current = `${this.current && this.current !== "-" ? parseFloat(this.current) / 100 : ""}`;
     },
     append(value) {
-      this.current = Number.isInteger(value)
-        ? value === 0 && this.current.charAt(0) === ""
-          ? ""
-          : this.current.length <= 12
-          ? this.current + value
-          : this.current
-        : this.current.charAt(0) === ""
-        ? ""
-        : this.current.charAt(this.current.length - 1) === " "
-        ? this.current
-        : this.current + ` ${value} `;
+      if (this.current.length <= 12) {
+        if (Number.isInteger(value) || value === ".") {
+          this.current =
+            this.current === "0" && value !== "." ? "" : this.current + value;
+        } else if (this.current && !Number.isInteger(value) && this.current.charAt(this.current.length-1) != " ") {
+          this.current += ` ${value} `;
+        }
+      }
     },
     equals() {
-      this.current = !this.current ? "0" : this.current;
-      let result = eval(this.current.replace(/×/g, "*").replace(/÷/g, "/"));
+      console.log("before current: " + this.current)
+      this.current = !this.current ? "" : this.current;
+      console.log("current: " + this.current)
+      let result = !this.current
+        ? ""
+        : eval(this.current.replace(/×/g, "*").replace(/÷/g, "/"));
       this.current =
         result === Infinity || Number.isNaN(result) ? "" : `${result}`;
+    },
+    backspace() {
+      this.current = this.current.slice(0, -1);
     }
+  },
+  mounted() {
+    window.addEventListener("keyup", event => {
+      let btns = document.getElementsByClassName("btn");
+      btns.forEach(btn => btn.blur());
+      if (event.key === "=" || event.key === "Enter") {
+        this.equals();
+      } else if (event.key === "Escape") {
+        this.clear();
+      } else if (event.key === "Backspace") {
+        this.backspace();
+      } else if (event.key === "%") {
+        this.percent();
+      } else if (event.key === "+") {
+        this.append("+");
+      } else if (event.key === "-") {
+        this.append("-");
+      } else if (event.key === "*") {
+        this.append("×");
+      } else if (event.key === "/") {
+        this.append("÷");
+      } else if (event.key === ".") {
+        this.append(".");
+      } else if (48 <= event.keyCode <= 57) {
+        for (var i = 48; i <= 57; i++) {
+          if (event.keyCode === i) {
+            this.append(i - 48);
+          }
+        }
+      }
+    });
   }
 };
 </script>
